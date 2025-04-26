@@ -1,0 +1,50 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+.Navbar{
+    display: flex;
+    position: fixed;
+    top: 0;
+    justify-content: space-between;
+    align-items: center;
+    height: 3em;
+    width: 100%;
+    background-color: black;
+    z-index: 10;
+}
+.Navbar a{
+    font-size: 30px;
+    font-weight: bold;
+    text-decoration: none;
+    margin-left: 1em;
+    color: white;
+}
+.navbar-items{
+    display: flex;
+    align-items: center;
+    margin-right: 1em;
+}
+.navbar-items a{
+    position: relative;
+    font-size: 14px;
+    margin-inline: 1em;
+    text-decoration: none;
+    color: rgb(194, 194, 194);
+}
+.navbar-items a::after{
+    content: "";
+    width: 0%;
+    height: 2px;
+    position: absolute;
+    top: 140%;
+    left: 0;
+    transition: 0.2s ease-out;
+}
+.navbar-items a:hover{
+    color: white;
+}
+.navbar-items a:hover::after{
+    background-color: white;
+    width: 110%;
+}

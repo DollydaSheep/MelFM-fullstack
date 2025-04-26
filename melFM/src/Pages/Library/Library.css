@@ -1,0 +1,106 @@
+.userpage-profile-library{
+    position: absolute;
+    height: 4em;
+    width: 4em;
+    background-color: yellowgreen;
+    border-radius: 50%;
+    top: 5em;
+    left: 5%;
+}
+.userpage-username-library{
+    position: absolute;
+    left: 2.3em;
+    top: 0.3em;
+    color: white;
+}
+.userpage-hover-items-library{
+    display: flex;
+    position: relative;
+    top: 12em;
+    font-size: 8px;
+    left: 0em;
+    color: white;
+    cursor: pointer;
+}
+.userpage-hover-items-library a{
+    margin-right: 2em;
+    text-decoration: none;
+    color: white;
+    font-size: 16px;
+    position: relative;
+}
+.userpage-hover-items-library a:hover::after{
+    content: "";
+    background-color: red;
+    width: 100%;
+    height: 6px;
+    position: absolute;
+    top: 180%;
+    left: 0;
+    z-index: -1;
+}
+.userpage-hover-items-library-active::after{
+    content: "";
+    background-color: red;
+    width: 100%;
+    height: 2px;
+    position: absolute;
+    top: 120%;
+    left: 0;
+    z-index: -1;
+}
+.userpage-hover-items-library-active{
+    pointer-events: none;
+}
+.userpage-library-dashboard h1:nth-child(1){
+    margin-top: 1em;
+    margin-left: 2.2em;
+    margin-bottom: 1em;
+}
+.userpage-library-dashboard h1:nth-child(3),.userpage-library-dashboard h1:nth-child(4){
+    font-size: 20px;
+    margin-left: 3.5em;
+    margin-top: 1.5em;
+}
+.userpage-library-dashboard h1:nth-child(4){
+    margin-top: 0;
+}
+.library-dashboard-hover-items{
+    margin-left: 4.4em;
+}
+.library-dashboard-hover-items a{
+    margin-right: 3em;
+    text-decoration: none;
+    color: black;
+    font-weight: 400;
+    font-size: 18px;
+    position: relative;
+}
+.library-dashboard-hover-items a:hover::after{
+    content: "";
+    background-color: red;
+    width: 100%;
+    height: 2px;
+    position: absolute;
+    top: 120%;
+    left: 0;
+    z-index: -1;
+}
+.pagination{
+    width: 500px;
+    margin-top: 2em;
+    margin-left: 10em;
+    margin-bottom: 2em;
+}
+.pagination-container{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.pagination-page{
+    cursor: pointer;
+    margin-left: 1em;
+}
+.pagination-active{
+    color: red;
+}
