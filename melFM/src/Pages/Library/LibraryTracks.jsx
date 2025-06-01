@@ -65,6 +65,7 @@ const LibraryTracks = () => {
       {console.log(fdata)}
       {console.log(fdata.length)}
       <div className="userpage-recent-tracks">
+        <h1>Tracks</h1>
       {Object.entries(fdata).map((item,index)=>{
           return (<>
             <div key={index} className="userpage-recent-tracks-item">

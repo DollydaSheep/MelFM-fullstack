@@ -81,7 +81,7 @@ app.post('/signup', async (req,res)=>{
         .select()
         if(error) throw error
         else{
-            const scopes = ['user-read-currently-playing'];
+            const scopes = ['user-read-currently-playing','user-read-playback-state'];
             let authorizeURL = spotifyAPI.createAuthorizeURL(scopes);
             authorizeURL += '&showdialog=true';
             console.log(authorizeURL);
@@ -140,7 +140,16 @@ app.get('/user/:username', async (req,res)=>{
                 .order('listen_num',{ascending: false})
                 .limit(10);
             if(listenError) throw listenError
-            else return res.status(200).json({data: listenData,listens:userData[0].listens})
+
+            const {data: topArtistData, error: topArtistError} = await supabase
+                .rpc('top_artists_featured_by_user', {uid: userId});
+            if(topArtistError) throw topArtistError
+
+            const {data: topTracksData ,error: topTracksError} = await supabase
+                .rpc('top_tracks_by_user', {uid: userId});
+            if(topTracksError) throw topTracksError
+
+            else return res.status(200).json({data: listenData, topArtist: topArtistData, topTracks: topTracksData ,listens:userData[0].listens})
         }
 
     } catch(error){
@@ -340,6 +349,9 @@ io.on("connection", async (socket)=>{
         const pollInterval = setInterval(async ()=>{
             try{
                 const data = await uSpotifyAPI.getMyCurrentPlayingTrack();
+                const isPlaying = await uSpotifyAPI.getMyCurrentPlaybackState();
+                let isPlayingData = {track_name: data.body.item.name, is_playing: isPlaying};
+
                 console.log((Object.keys(data.body).length != 0 ? data.body.item.name : "no song"));
                 let track_Info = {};
                 if(Object.keys(data.body).length != 0){
@@ -364,7 +376,7 @@ io.on("connection", async (socket)=>{
                         //     }
                         // })
                         const artistData = await uSpotifyAPI.getArtist(data.body.item.artists[0].id);
-                        const artistImg = artistData.body.images[2].url;
+                        const artistImg = artistData.body.images[1].url;
                         const {data: trackData,error: trackError} = await supabase
                             .from('listen')
                             .insert([
@@ -396,7 +408,8 @@ io.on("connection", async (socket)=>{
                 }
                 
                 
-                
+                socket.emit('is_playing',(isPlayingData));
+
                 console.log(userSockets[user] + " " + socket.username);
                 console.log("");
             }catch(err){

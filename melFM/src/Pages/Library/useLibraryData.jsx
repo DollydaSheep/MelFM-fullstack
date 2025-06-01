@@ -9,6 +9,7 @@ const useLibraryData = (url) => {
         const [page,setPage] = useState(1);
         const [listens,setListens] = useState(0);
         const [totalPages,setTotalPages] = useState(1)
+        const [maxCount, setMaxCount] = useState(0);
     
         useEffect(()=>{
           const fetchData = async () => {
@@ -21,6 +22,7 @@ const useLibraryData = (url) => {
                 setListens(data.listens);
                 console.log("yeahman")
                 setLoading(false)
+                setMaxCount(data.data[0].listen_count)
               }
             }catch(error){
               console.error(error);
@@ -29,7 +31,7 @@ const useLibraryData = (url) => {
           fetchData();
         },[url,page])
   return (
-    { loading, fdata, listens, page, totalPages, setPage}
+    { loading, fdata, listens, page, totalPages, setPage, maxCount}
   );
 }
 

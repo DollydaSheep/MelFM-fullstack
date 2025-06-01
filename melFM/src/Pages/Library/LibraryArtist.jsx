@@ -8,8 +8,9 @@ const LibraryArtist = () => {
     const {username} = useParams();
     const location = useLocation();
     const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-    const {loading, fdata, listens, page, totalPages, setPage} = 
+    const {loading, fdata, listens, page, totalPages, setPage, maxCount} = 
       useLibraryData(`http://localhost:3020/user/${username}/library/artist`);
+
 
   if(loading){
     return(
@@ -65,14 +66,17 @@ const LibraryArtist = () => {
       {console.log(fdata)}
       {console.log(fdata.length)}
       <div className="userpage-recent-tracks">
+        <h1>Artists</h1>
       {Object.entries(fdata).map((item,index)=>{
           return (<>
             <div key={index} className="userpage-recent-tracks-item">
-              <img src={item[1].artist_img} alt="" />
+              <div><img src={item[1].artist_img} alt="" width={40}/></div>
               <div className='track-item-label'>
                 <p>{item[1].artist_name}</p>
                 
-                <p>{item[1].listen_count} listens</p>
+                <div className="bar-count" style={{width: (item[1].listen_count/maxCount) * 100 + "%"}}><p>{item[1].listen_count} listens</p></div>
+                {console.log(maxCount)}
+                {/* <p>{item[1].listen_count} listens</p> */}
               </div>
             </div>
           </>)

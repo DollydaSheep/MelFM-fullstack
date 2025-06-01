@@ -10,7 +10,7 @@ const Library = () => {
     const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
     const {loading, fdata, listens, page, totalPages, setPage} = 
       useLibraryData(`http://localhost:3020/user/${username}/library`);
-
+    
   if(loading){
     return(
       <>
@@ -65,6 +65,7 @@ const Library = () => {
       {console.log(fdata)}
       {console.log(fdata.length)}
       <div className="userpage-recent-tracks">
+        <h1>Listens</h1>
       {Object.entries(fdata).map((item,index)=>{
           return (<>
             <div key={index} className="userpage-recent-tracks-item">
@@ -72,7 +73,7 @@ const Library = () => {
               <div className='track-item-label'>
                 <p>{item[1].track_name}</p>
                 <p>{item[1].artist_name}</p>
-                <p>{new Date(item[1].created_at).getDate() + " " + months[new Date(item[1].created_at).getMonth()] + " " + new Date(item[1].created_at).getHours() + ":" + new Date(item[1].created_at).getMinutes()}</p>
+                <p>{new Date(item[1].created_at).getDate() + " " + months[new Date(item[1].created_at).getMonth()] + " " + new Date(item[1].created_at).getHours() + ":" + (new Date(item[1].created_at).getMinutes() < 10 ? "0" + new Date(item[1].created_at).getMinutes()  : new Date(item[1].created_at).getMinutes())}</p>
               </div>
             </div>
           </>)

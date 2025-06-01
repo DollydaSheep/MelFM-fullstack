@@ -104,3 +104,14 @@
 .pagination-active{
     color: red;
 }
+.bar-count{
+    height: 2em;
+    background-color: red;
+    display: flex;
+    align-items: center;
+}
+.bar-count p{
+    position: absolute;
+    margin-left: 1.5em;
+    color: black !important;
+}
