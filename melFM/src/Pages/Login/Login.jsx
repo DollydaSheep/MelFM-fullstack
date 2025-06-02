@@ -4,7 +4,7 @@ import './Login.css'
 import {io} from 'socket.io-client'
 import { useSocket } from '../../Context';
 
-const Login = () => {
+const Login = ( {setLoginState} ) => {
 
   const [user,setUser] = useState("");
   const [pass,setPass] = useState("");
@@ -26,6 +26,7 @@ const Login = () => {
         const data = await response.json();
         console.log(data);
         const socket = initializeSocket({auth : { token : "test" , user:user , refresh: data.refresh, id: data.id , listens: data.listens}});
+        setLoginState(true);
         socket.on("connect",()=>{
           console.log("yawa");
         })

@@ -48,3 +48,41 @@
     background-color: white;
     width: 110%;
 }
+.navbar-items div{
+    width: 2em;
+    height: 2em;
+    background-color: greenyellow;
+    border-radius: 50%;
+    cursor: pointer;
+}
+.popup{
+    background-color: black;
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    right: 0;
+    margin: 0.5em;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.popup div{
+    width: 90%;
+    height: 2em;
+    outline: gray 1px solid;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    margin-bottom: 0.5em;
+}
+.popup div:hover{
+    outline: white 1px solid;
+}
+.popup h1{
+    font-size: large;
+    color: white;
+    pointer-events: none;
+}

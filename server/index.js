@@ -408,7 +408,7 @@ io.on("connection", async (socket)=>{
                 }
                 
                 
-                socket.emit('is_playing',(isPlayingData));
+                socket.emit('is_playing',(Object.keys(data).length != 0 ? isPlayingData : ""));
 
                 console.log(userSockets[user] + " " + socket.username);
                 console.log("");
