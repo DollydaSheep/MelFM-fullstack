@@ -3,10 +3,13 @@ import './Navbar.css';
 import {Link} from "react-router-dom"
 import { useNavigate } from 'react-router-dom';
 
-const Navbar = ({loginState,setLoginState}) => {
+const Navbar = ({loginState,setLoginState,currentUser}) => {
 
   const [showPopup,setShowPopup] = useState(false);
   const navigate = useNavigate();
+  const username = currentUser;
+
+  const image = `http://localhost:3020/uploads/profile-image-${username}.jpg`;
 
   let timeOut;
 
@@ -44,7 +47,8 @@ const Navbar = ({loginState,setLoginState}) => {
         <h2>•</h2>
         {loginState ? 
         (<><div onMouseEnter={handleMouseEnter}
-                onMouseLeave={handleMouseLeave}>
+                onMouseLeave={handleMouseLeave}
+                style={{background : `url(${image}) no-repeat center`, backgroundSize: '100%'}}>
           </div></>) 
         : 
         (<><Link to="/login">Log In</Link>

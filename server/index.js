@@ -2,9 +2,17 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const mysql = require("mysql2");
+const multer = require('multer');
+const path = require('path')
+const fs = require('fs')
 const SpotifyWebAPI = require('spotify-web-api-node');
 const { createClient } = require('@supabase/supabase-js');
 
+const supabaseUrl = 'https://dkyexuxocwhcxzpjannt.supabase.co'
+const supabaseKey = process.env.SUPABASE_KEY
+const supabase = createClient(supabaseUrl, supabaseKey)
+
+const userRoutes = require('./routes/userRoutes')
 
 const port = 3020;
 
@@ -13,6 +21,35 @@ const spotifyAPI = new SpotifyWebAPI({
     clientSecret: process.env.CLIENT_SECRET,
     redirectUri: process.env.REDIRECT_URL
 })
+
+let user;
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, './uploads')
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = user;
+    const uploadDir = './uploads'
+    const baseName = "profile-" + file.fieldname + "-" + uniqueSuffix;
+    const ext = path.extname(file.originalname);
+
+    fs.readdir(uploadDir, (err, files) => {
+      if (err) return cb(err);
+
+      files.forEach(existingFile => {
+        if (path.parse(existingFile).name === baseName) {
+          fs.unlinkSync(path.join(uploadDir, existingFile)); // delete file
+          console.log("deleted")
+        }
+      });
+    });
+
+    cb(null, "profile-" + file.fieldname + '-' + uniqueSuffix + '.jpg');
+  }
+})
+
+const upload = multer({ storage: storage })
 
 const app = express();
 
@@ -23,14 +60,11 @@ const app = express();
 //     database: 'melfm-fs'
 // })
 
-const supabaseUrl = 'https://dkyexuxocwhcxzpjannt.supabase.co'
-const supabaseKey = process.env.SUPABASE_KEY
-const supabase = createClient(supabaseUrl, supabaseKey)
-
 app.use(express.json());
 app.use(cors());
 
-let user;
+// Serve uploads folder
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.post('/login',async (req,res) => {
     
@@ -53,6 +87,7 @@ app.post('/login',async (req,res) => {
     
     if(error) throw error
     else{
+        user = data[0].username;
         console.log(data[0].username);
         let refresh = data[0].refreshToken;
         return res.status(200).json({user: req.body.user, refresh: refresh, id:data[0].id, listens: data[0].listens});
@@ -94,6 +129,19 @@ app.post('/signup', async (req,res)=>{
     
 })
 
+app.post('/settings',upload.single('image'),async (req,res) => {
+    console.log(user);
+    const {data,error} = await supabase
+        .from('users')
+        .update({profile_img : `/uploads/profile-image-${user}`})
+        .eq('username',`${user}`)
+        .select()
+    if(error) throw error
+    else{
+        res.redirect('http://localhost:5173/settings')
+    }
+})
+
 app.get('/callback', async (req,res) =>{
     const error = req.query.error;
     const code = req.query.code;
@@ -122,169 +170,7 @@ app.get('/callback', async (req,res) =>{
     else return res.redirect('http://localhost:5173/login');
 })
 
-app.get('/user/:username', async (req,res)=>{
-    try{
-        const user = req.params.username;
-        const {data: userData,error: userError} = await supabase
-            .from('users')
-            .select('*')
-            .eq('username',user)
-        if(userError) throw userError
-        else if(!userData) return res.sendStatus(404)
-        else{
-            const userId = userData[0].id;
-            const {data: listenData,error: listenError} = await supabase
-                .from('listen')
-                .select('*,users(*)')
-                .eq('owner_id',userId)
-                .order('listen_num',{ascending: false})
-                .limit(10);
-            if(listenError) throw listenError
-
-            const {data: topArtistData, error: topArtistError} = await supabase
-                .rpc('top_artists_featured_by_user', {uid: userId});
-            if(topArtistError) throw topArtistError
-
-            const {data: topTracksData ,error: topTracksError} = await supabase
-                .rpc('top_tracks_by_user', {uid: userId});
-            if(topTracksError) throw topTracksError
-
-            else return res.status(200).json({data: listenData, topArtist: topArtistData, topTracks: topTracksData ,listens:userData[0].listens})
-        }
-
-    } catch(error){
-        console.error(error)
-    }
-    // try{
-    //     const user = req.params.username;
-    //     var query = `SELECT * from users where username = ?`;
-
-    //     const [userResults] = await db.promise().query(query,[user]);
-    //     if(userResults.length == 0){
-    //         res.sendStatus(404);
-    //     }
-
-    //     const owner = userResults[0].id;
-    //     var listenquery = `SELECT * FROM listen full join users on id = owner_id where owner_id = ? order by listen_num desc limit 10`;
-    //     const [listenResult] = await db.promise().query(listenquery,[owner]);
-        
-    //     res.status(200).json(listenResult);
-
-    // }catch(err){
-    //     console.error(err);
-    // }
-
-    // db.query(query,[user],(error,results)=>{
-    //     if(error) throw error
-    //     if(results.length === 0){
-    //         res.sendStatus(404);
-    //     }
-    //     else{
-    //         var owner = results[0].id;
-    //         var query = `SELECT * FROM listen full join users on id = owner_id where owner_id = ? order by listen_num desc limit 10`;
-    //         db.query(query,[owner],(error,results)=>{
-    //             if(error) throw error
-    //             else{
-    //                 res.status(200).json(results);
-    //             }
-    //         })
-    //     }
-    // })
-    
-})
-
-app.get('/user/:username/library',async (req,res)=>{
-    try{
-        const user = req.params.username;
-        const page = parseInt(req.query.page);
-        const offset = (page - 1) * 20;
-        var query = `SELECT * from users where username = ?`;
-
-        const {data: userData, error: userError} = await supabase
-            .from('users')
-            .select('*')
-            .eq('username',user)
-        if(userError) throw userError
-        
-        const userResult = userData[0].id;
-
-        const {data: listenData,error: listenError} = await supabase
-            .from('listen')
-            .select('*,users(*)')
-            .eq('owner_id',userResult)
-            .order('listen_num',{ascending: false})
-            .range(offset, offset + 19);
-        if(listenError) throw listenError
-        else{
-            return res.status(200).json({data:listenData,currentpage:page,totalpages:Math.ceil(userData[0].listens / 20),listens: userData[0].listens})
-        }
-
-        // const [userResults] = await db.promise().query(query,[user]);
-        // if(userResults.length == 0){
-        //     res.sendStatus(404);
-        // }
-
-        // const owner = userResults[0].id;
-        // var listenquery = `SELECT * FROM listen full join users on id = owner_id where owner_id = ? order by listen_num desc limit 20 offset ${offset}`;
-        // const [listenResult] = await db.promise().query(listenquery,[owner]);
-        
-        // res.status(200).json({data:listenResult,currentpage:page,totalpages:Math.ceil(userResults[0].listens / 20)});
-
-    }catch(err){
-        console.error(err);
-    }
-})
-
-app.get('/user/:username/library/artist', async (req,res)=>{
-    const user = req.params.username;
-    const page = parseInt(req.query.page);
-    const offset = (page - 1) * 20;
-
-    try{
-        const {data: userData,error: userError} = await supabase
-            .from('users')
-            .select('*')
-            .eq('username',user)
-        if(userError) throw userError
-
-        const userId = userData[0].id;
-
-        const {data,error} = await supabase
-            .rpc('top_artists_by_user', {uid: userId});
-        if(error) throw error
-        else {
-            console.log(data)
-            return res.status(200).json({data:data,currentpage:page,totalpages:Math.ceil(data.length / 20),listens: userData[0].listens})
-        }
-    } catch(error){
-        console.error(error)
-    }
-})
-
-app.get('/user/:username/library/tracks', async (req,res)=>{
-    const user = req.params.username;
-    const page = parseInt(req.query.page);
-    const offset = (page - 1) * 20;
-
-    try{
-        const {data: userData, error: userError} = await supabase
-            .from('users')
-            .select('*')
-            .eq('username',user)
-        if(userError) throw userError
-
-        const userId = userData[0].id;
-
-        const {data,error} = await supabase
-            .rpc('top_tracks_by_user', {uid: userId});
-        if(error) throw error
-        else{
-            return res.status(200).json({data:data,currentpage:page,totalpages:Math.ceil(data.length / 20),listens: userData[0].listens})
-        }
-    }catch(err){
-        console.error(err)
-    }
-})
+app.use(userRoutes);
 
 const server = app.listen(port, ()=>{
     console.log("server is running on localhost 3020");

@@ -4,7 +4,7 @@ import { BrowserRouter as Router,Routes,Route, useParams, useNavigate, Navigate,
 import {io} from 'socket.io-client';
 import { useSocket } from '../../Context';
 
-const User = () => {
+const User = ({setCurrentUser}) => {
 
   const navigate = useNavigate();
   const {username} = useParams();
@@ -19,6 +19,10 @@ const User = () => {
   const currentTrack = useRef(null);
   const c = useRef(null);
   const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+  setCurrentUser(username);
+
+  const image = `http://localhost:3020/uploads/profile-image-${username}.jpg`;
   
   useEffect(() => {
 
@@ -123,7 +127,7 @@ const User = () => {
     <div className='userpage-backdrop'>
       
     </div>
-    <div className="userpage-profile-main">
+    <div className="userpage-profile-main" style={{background : `url(${image}) no-repeat center`, backgroundSize: '100%'}}>
       <h1 className='userpage-username-main'>{username}</h1>
       <h1 className='userpage-listens-label-main'>Listens</h1>
       <h1 className='userpage-artists-label-main'>Artists</h1>

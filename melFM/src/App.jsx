@@ -14,20 +14,21 @@ import Settings from './Pages/Settings/Settings';
 const App = () => {
 
   const [loginState,setLoginState] = useState(false);
+  const [currentUser, setCurrentUser] = useState("");
 
   return (
     <Router>
-      <Navbar loginState={loginState} setLoginState={setLoginState}/>
+      <Navbar loginState={loginState} setLoginState={setLoginState} currentUser={currentUser}/>
       <Routes>
         <Route path='/' element={<Home/>}/>
         <Route path='/login' element={<Login setLoginState={setLoginState}/>} />
         <Route path='/signup' element={<Signup/>} />
-        <Route path='/user/:username' element={<User/>} />
+        <Route path='/user/:username' element={<User setCurrentUser={setCurrentUser}/>} />
         <Route path='/error' element={<Error404/>} />
         <Route path='/user/:username/library' element={<Library/>} />
         <Route path='/user/:username/library/artist' element={<LibraryArtist/>} />
         <Route path='/user/:username/library/tracks' element={<LibraryTracks/>} />
-        <Route path='/settings' element={<Settings/>} />
+        <Route path='/settings' element={<Settings currentUser={currentUser}/>}/>
       </Routes>
     </Router>
   )
