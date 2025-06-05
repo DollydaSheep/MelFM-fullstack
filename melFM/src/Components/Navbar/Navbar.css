@@ -57,7 +57,7 @@
 }
 .popup{
     background-color: black;
-    position: absolute;
+    position: fixed;
     width: 100px;
     height: 100px;
     right: 0;
@@ -85,4 +85,14 @@
     font-size: large;
     color: white;
     pointer-events: none;
+}
+
+@media only screen and (max-width: 600px){
+    .Navbar a{
+        font-size: 18px;
+    }
+    .navbar-items a{
+        font-size: 8px;
+        margin-inline: 0.5em;
+    }
 }

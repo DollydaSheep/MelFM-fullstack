@@ -44,7 +44,7 @@ const Navbar = ({loginState,setLoginState,currentUser}) => {
         <Link>Trend</Link>
         <Link>Charts</Link>
         <Link>Features</Link>
-        <h2>•</h2>
+        {/* <h2>•</h2> */}
         {loginState ? 
         (<><div onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
