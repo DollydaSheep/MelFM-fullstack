@@ -19,6 +19,7 @@ This project is built with **React.js** on the frontend and **Node.js + Express*
 - **API**: [Spotify Web API](https://developer.spotify.com/documentation/web-api/)
 
 ## 🧪 Preview
+![{AC5637D7-FFE5-4EF8-8F04-ECF6DD020CA6}](https://github.com/user-attachments/assets/80db7308-99e7-4704-9c5c-94a3811e7ec3)
 
 
 
